@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class SampleController {
     
-    /*Difference between pathvariable and requestparam: 
+    /*
+    Difference between pathvariable and requestparam: 
     requestparam : /employees/{id} <- in URL hierarchy
     pathvariable : /employees?id=9 <- as ? param
     
