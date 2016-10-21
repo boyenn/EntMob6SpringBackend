@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SampleRestController {
     @Autowired
     EmployeeService service;
+    
+    
     @RequestMapping("/employees")
     @ResponseBody
     public ResponseEntity<List<Employee>> getAll(){

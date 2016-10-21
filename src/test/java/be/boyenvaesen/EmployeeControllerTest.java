@@ -48,7 +48,7 @@ public class EmployeeControllerTest {
     public void testSingle() {
 
         ResponseEntity<Employee> responseEntity
-                = restTemplate.getForEntity(String.format("/employees/%s", singleEmployee.getId()), Employee.class);
+                = restTemplate.getForEntity("/employees/" + singleEmployee.getId(), Employee.class);
         Employee employee = responseEntity.getBody();
         Assert.assertEquals("Boyen", employee.getFirstName());
     }
