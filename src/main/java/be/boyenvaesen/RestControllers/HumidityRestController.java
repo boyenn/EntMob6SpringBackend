@@ -7,8 +7,9 @@ package be.boyenvaesen.RestControllers;
 
 import be.boyenvaesen.Services.HumidityService;
 import be.boyenvaesen.Models.Humidity;
-import be.boyenvaesen.Models.HumidityByMinute;
+import be.boyenvaesen.Models.HumidityByInterval;
 import be.boyenvaesen.helpers.postObject;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.*;
@@ -21,31 +22,27 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 public class HumidityRestController {
+
     @Autowired
     HumidityService service;
-    
-    
+
     @RequestMapping("/humidity")
     @ResponseBody
-    public ResponseEntity<List<Humidity>> getAll(){
-        return new ResponseEntity<>(service.getAll(),HttpStatus.OK);
-        
+    public ResponseEntity<List<Humidity>> getAll() {
+        return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
+
     }
-    @RequestMapping("/humidity/minute")
+
+    @RequestMapping("/humidity/hour")
     @ResponseBody
-    public ResponseEntity<List<HumidityByMinute>> getByMinute(){
-        
-        return new ResponseEntity<>(service.getBetweenDatesByInterval(HumidityByMinute.class, new Date(1476391394000L), new Date()),HttpStatus.OK);
-        
+    public ResponseEntity<List<HumidityByInterval>> getAllByHour() {
+        return new ResponseEntity<>(service.findAllByInterval(Calendar.HOUR), HttpStatus.OK);
+
     }
-    
-//    @RequestMapping("/employees/{id}")
-//    @ResponseBody
-//    public ResponseEntity<Employee> getOne(@PathVariable("id") Long id){
-//        return new ResponseEntity<>(service.findOne(id),HttpStatus.OK);
-//    }
-    @RequestMapping(path = "/humidity",method = RequestMethod.POST)
-    public ResponseEntity<Humidity>  postNew(@RequestBody postObject<Float> hum){
-        return new ResponseEntity<>(service.addNew(hum),HttpStatus.CREATED);
+
+
+    @RequestMapping(path = "/humidity", method = RequestMethod.POST)
+    public ResponseEntity<Humidity> postNew(@RequestBody postObject<Float> hum) {
+        return new ResponseEntity<>(service.addNew(hum), HttpStatus.CREATED);
     }
 }

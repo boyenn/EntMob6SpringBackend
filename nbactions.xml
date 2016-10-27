@@ -11,7 +11,7 @@
                 <goal>test</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.boyenvaesen.MainContext</exec.args>
+                <exec.args>-classpath %classpath ${packageClassName}</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

@@ -6,16 +6,17 @@
 package be.boyenvaesen.Services;
 
 import be.boyenvaesen.Models.*;
-import be.boyenvaesen.Repositories.HumidityByHourRepository;
-import be.boyenvaesen.Repositories.HumidityByIntervalRepository;
-import be.boyenvaesen.Repositories.HumidityByMinuteRepository;
 import be.boyenvaesen.Repositories.HumidityRepository;
 import be.boyenvaesen.helpers.postObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,24 +28,19 @@ public class HumidityService {
 
     @Autowired
     private HumidityRepository rep;
+    
+    @Autowired 
+    private MongoTemplate mongoTemplate;
 
-   
-    @Autowired
-    private HumidityByMinuteRepository minuteRep;
-    @Autowired
-    private HumidityByHourRepository hourRep;
-     @Autowired
-    private HumidityByIntervalRepository intervalRep;
     public List<Humidity> getAll() {
         return (List<Humidity>) rep.findAll();
     }
-    public List<Humidity> getBetweenDates(Date start, Date end){
+
+    public List<Humidity> getBetweenDates(Date start, Date end) {
         return rep.findByMeasuredBetween(start, end);
     }
 
-
-
-    public Humidity findOne(long Id) {
+    public Humidity findOne(String Id) {
 
         return rep.findOne(Id);
     }
@@ -63,36 +59,31 @@ public class HumidityService {
         return returnList;
     }
 
-    
-
     public void deleteAll() {
         rep.deleteAll();
     }
     
-    
-    //BY INTERVAL
-   public <T extends HumidityByInterval> List<T>  getByInterval(Class <T> type){
-        if(type == HumidityByMinute.class){
-           return (List<T>)minuteRep.findAll();
-       }
-        else if(type == HumidityByHour.class){
-            return (List<T>)hourRep.findAll();
-       }
+    //USE mongoTemplate, cannot use CRUD repositories because you want to define the collection name
+    public List<HumidityByInterval> findByIntervalBetween(Date start,Date end, int interval){
+        Query query = Query.query(Criteria.where("data").gte(start).lte(end));
+        if(interval==Calendar.HOUR){
+            
+           return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour");
+        }
+        
+        
+        
+        
         return null;
-   }
-    public <T extends HumidityByInterval> List<T>  getBetweenDatesByInterval(Class <T> type,Date start,Date end){
-       if(type == HumidityByMinute.class){
-           return (List<T>)minuteRep.findByAtTimeBetween(start, end);
-       }
-       else if(type == HumidityByHour.class){
-            return (List<T>)hourRep.findByAtTimeBetween(start, end);
-       }
-       return null;
-   }
-    
-   public void saveByInterval(HumidityByInterval hbm){
-       intervalRep.save(hbm);
-   }
-    
-   
+    }
+    //USE mongoTemplate, cannot use CRUD repositories because you want to define the collection name
+     public List<HumidityByInterval> findAllByInterval( int interval){
+        
+        if(interval==Calendar.HOUR){
+            
+           return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyhour");
+        }
+        return null;
+    }
+
 }

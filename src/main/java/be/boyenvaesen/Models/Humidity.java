@@ -7,40 +7,33 @@ package be.boyenvaesen.Models;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
+import org.springframework.data.annotation.Id;
+
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
  * @author Boyen
  */
-@Entity
-@Table(name = "humidities")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Document(collection = "humidities")
+public class Humidity  {
 
-public class Humidity implements Serializable{
-    private @Id @GeneratedValue(strategy = GenerationType.TABLE)  Long id;
+    private @Id
+    String id;
     private float percentage;
-    
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+
     private Date measured;
 
     public Humidity() {
     }
 
-    public Humidity( float percentage, Date timeDate) {
-        
+    public Humidity(float percentage, Date timeDate) {
+
         this.percentage = percentage;
         this.measured = timeDate;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -60,7 +53,4 @@ public class Humidity implements Serializable{
         this.measured = measured;
     }
 
-   
-    
-    
 }
