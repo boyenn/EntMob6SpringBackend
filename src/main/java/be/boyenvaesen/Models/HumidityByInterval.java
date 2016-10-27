@@ -21,10 +21,10 @@ public class HumidityByInterval {
     private String id;
     private Date date;
     private double avPer;
-    private static final Logger log = LoggerFactory.getLogger(HumidityByInterval.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HumidityByInterval.class);
 
     public HumidityByInterval() {
-        log.info("HumidityByInterval()");
+        LOGGER.info("HumidityByInterval()");
     }
 
     public String getId() {
@@ -40,7 +40,7 @@ public class HumidityByInterval {
     }
 
     public void setDate(BasicDBObject dateObject) {
-        log.info("setid");
+        LOGGER.info("setid");
         Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
         c.set(Calendar.YEAR, dateObject.getInt("jaar"));
