@@ -33,10 +33,24 @@ public class HumidityRestController {
 
     }
 
+    @RequestMapping("/humidity/month")
+    @ResponseBody
+    public ResponseEntity<List<HumidityByInterval>> getAllByMonth() {
+        return new ResponseEntity<>(service.findAllByInterval(Calendar.MONTH), HttpStatus.OK);
+
+    }
+    
     @RequestMapping("/humidity/hour")
     @ResponseBody
     public ResponseEntity<List<HumidityByInterval>> getAllByHour() {
         return new ResponseEntity<>(service.findAllByInterval(Calendar.HOUR), HttpStatus.OK);
+
+    }
+    
+    @RequestMapping("/humidity/minute")
+    @ResponseBody
+    public ResponseEntity<List<HumidityByInterval>> getAllByMinute() {
+        return new ResponseEntity<>(service.findAllByInterval(Calendar.MINUTE), HttpStatus.OK);
 
     }
 

@@ -66,24 +66,31 @@ public class HumidityService {
     //USE mongoTemplate, cannot use CRUD repositories because you want to define the collection name
     public List<HumidityByInterval> findByIntervalBetween(Date start,Date end, int interval){
         Query query = Query.query(Criteria.where("data").gte(start).lte(end));
+      
         if(interval==Calendar.HOUR){
             
            return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour");
         }
         
+        switch(interval){
+            case Calendar.HOUR: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour"); 
+            case Calendar.MONTH: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybymonth");
+            case Calendar.MINUTE:  return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyminute"); 
+            default: return null;
+        }
         
         
         
-        return null;
     }
     //USE mongoTemplate, cannot use CRUD repositories because you want to define the collection name
      public List<HumidityByInterval> findAllByInterval( int interval){
-        
-        if(interval==Calendar.HOUR){
-            
-           return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyhour");
+       
+        switch(interval){
+            case Calendar.HOUR: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyhour");
+            case Calendar.MONTH: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybymonth");
+            case Calendar.MINUTE: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyminute"); 
+            default: return null;
         }
-        return null;
     }
 
 }

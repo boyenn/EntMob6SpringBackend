@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -49,7 +50,7 @@ public class HumidityControllerTest {
     @Before
     public void setUp() {
         Random r = new Random();
-        //service.deleteAll();
+        service.deleteAll();
         firstDate = new Date();
         Calendar cal = Calendar.getInstance();
        
@@ -120,6 +121,8 @@ public class HumidityControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         humidities = responseEntity.getBody();
         //Check humidity percentages
+       // assertThat(humidities).hasSize(3).contains(humidities[0],humidities[1]);
+        
         assertEquals(75.1f, humidities[0].getPercentage(), MAX_ASSERT_FLOAT_OFFSET);
         assertEquals(postedHumidity.getPercentage(), humidities[humidities.length-1].getPercentage(), MAX_ASSERT_FLOAT_OFFSET);
         assertEquals(95f, humidities[humidities.length-1].getPercentage(), MAX_ASSERT_FLOAT_OFFSET);

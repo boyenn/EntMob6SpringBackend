@@ -48,7 +48,7 @@ public class HumiditySchedules {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    @Scheduled(fixedRate = 2000)
+    
     public void updateIntervalDatabases() {
         log.info("Starting database cleanup");
 
