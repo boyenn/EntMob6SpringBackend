@@ -44,9 +44,10 @@ public class HumidityByInterval {
         Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
         c.set(Calendar.YEAR, dateObject.getInt("jaar"));
-        c.set(Calendar.MONTH, dateObject.getInt("maand"));
-        c.set(Calendar.DAY_OF_MONTH, tryOrNull(dateObject, "dag"));
-        c.set(Calendar.HOUR, tryOrNull(dateObject, "uur"));
+        c.set(Calendar.MONTH, dateObject.getInt("maand")-1);
+        int dayOfMonth = tryOrNull(dateObject, "dag");
+        c.set(Calendar.DAY_OF_MONTH,dayOfMonth==0?1: dayOfMonth);
+        c.set(Calendar.HOUR_OF_DAY, tryOrNull(dateObject, "uur"));
         c.set(Calendar.MINUTE, tryOrNull(dateObject, "minuut"));
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);

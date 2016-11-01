@@ -9,7 +9,6 @@ import be.boyenvaesen.Models.*;
 import be.boyenvaesen.Repositories.HumidityRepository;
 import be.boyenvaesen.helpers.postObject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;

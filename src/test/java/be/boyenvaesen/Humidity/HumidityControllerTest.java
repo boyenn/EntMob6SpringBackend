@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-
 public class HumidityControllerTest {
 
     //CONSTANTS

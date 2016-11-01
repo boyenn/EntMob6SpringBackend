@@ -29,6 +29,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -83,49 +84,31 @@ public class HumiditySchedules {
         
         switch (interval) {
             case Calendar.MONTH:
-                agg = newAggregation(
-                        match(Criteria.where("measured").gte(from).lte(to)),
-                        project("id").and("percentage").as("percentage")
-                                .andExpression("year(measured)").as("jaar")
-                                .andExpression("month(measured)").as("maand"),
+                agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
+                        monthProjection(),
                         group(fields("jaar", "maand")).avg("percentage").as("avPer"),
-                        project("avPer").and("id").previousOperation()
+                        projectObject()
                 );
                 break;
             case Calendar.DAY_OF_MONTH:
-                agg = newAggregation(
-                       match(Criteria.where("measured").gte(from).lte(to)),
-                        project("id").and("percentage").as("percentage")
-                                .andExpression("year(measured)").as("jaar")
-                                .andExpression("month(measured)").as("maand")
-                                .andExpression("dayOfMonth(measured)").as("dag"),
+                agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
+                        dayProjection(),
                         group(fields("jaar", "maand", "dag")).avg("percentage").as("avPer"),
-                        project("avPer").and("id").previousOperation()
+                        projectObject()
                 );
                 break;
             case Calendar.HOUR:
-                agg = newAggregation(
-                        match(Criteria.where("measured").gte(from).lte(to)),
-                        project("id").and("percentage").as("percentage")
-                                .andExpression("year(measured)").as("jaar")
-                                .andExpression("month(measured)").as("maand")
-                                .andExpression("dayOfMonth(measured)").as("dag")
-                                .andExpression("hour(measured)").as("uur"),
+                agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
+                        hourProjection(),
                         group(fields("jaar", "maand", "dag", "uur")).avg("percentage").as("avPer"),
-                        project("avPer").and("id").previousOperation()
+                        projectObject()
                 );
                 break;
             case Calendar.MINUTE:
-                agg = newAggregation(
-                        match(Criteria.where("measured").gte(from).lte(to)),
-                        project("id").and("percentage").as("percentage")
-                                .andExpression("year(measured)").as("jaar")
-                                .andExpression("month(measured)").as("maand")
-                                .andExpression("dayOfMonth(measured)").as("dag")
-                                .andExpression("hour(measured)").as("uur")
-                                .andExpression("minute(measured)").as("minuut"),
+                agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
+                        minuteProjection(),
                         group(fields("jaar", "maand", "dag", "uur", "minuut")).avg("percentage").as("avPer"),
-                        project("avPer").and("id").previousOperation()
+                        projectObject()
                 );
                 break;
 
@@ -136,6 +119,31 @@ public class HumiditySchedules {
         AggregationResults<DBObject> resultsDB = mongoTemplate.aggregate(agg, Humidity.class, DBObject.class);
 
         return resultsDB;
+    }
+
+    private static ProjectionOperation projectObject() {
+        return project("avPer").and("id").previousOperation();
+    }
+
+    private static ProjectionOperation minuteProjection() {
+        return hourProjection()
+                .andExpression("minute(measured)").as("minuut");
+    }
+
+    private static ProjectionOperation hourProjection() {
+        return dayProjection()
+                .andExpression("hour(measured)").as("uur");
+    }
+
+    private static ProjectionOperation dayProjection() {
+        return monthProjection()
+                .andExpression("dayOfMonth(measured)").as("dag");
+    }
+
+    private static ProjectionOperation monthProjection() {
+        return project("id").and("percentage").as("percentage")
+                .andExpression("year(measured)").as("jaar")
+                .andExpression("month(measured)").as("maand");
     }
 
     private void saveDBObjects(int interval, AggregationResults<DBObject> resultsDB) {

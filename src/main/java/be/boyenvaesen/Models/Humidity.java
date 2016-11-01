@@ -5,7 +5,6 @@
  */
 package be.boyenvaesen.Models;
 
-import java.io.Serializable;
 import java.util.Date;
 import org.springframework.data.annotation.Id;
 
@@ -17,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "humidities")
 public class Humidity  {
-
+    
     private @Id
     String id;
     private float percentage;
