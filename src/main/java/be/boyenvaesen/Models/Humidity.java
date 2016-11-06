@@ -26,10 +26,10 @@ public class Humidity  {
     public Humidity() {
     }
 
-    public Humidity(float percentage, Date timeDate) {
+    public Humidity(float percentage, Date measured) {
 
         this.percentage = percentage;
-        this.measured = timeDate;
+        this.measured = measured;
     }
 
     public String getId() {

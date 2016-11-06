@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 @SpringBootApplication
 @ComponentScan
 @EnableScheduling
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled=true)
 public class MainContext {
 
     public static void main(String[] args) throws Exception {
@@ -26,14 +28,9 @@ public class MainContext {
     @Bean
     CommandLineRunner init(final AccountRepository accountRepository) {
 
-        return new CommandLineRunner() {
-
-            @Override
-            public void run(String... arg0) throws Exception {
-                List<String> roles = Arrays.asList("USER","ADMIN");
-                accountRepository.save(new Account("boyen", "root",true,roles));
-
-            }
+        return arg0 -> {
+            List<String> roles = Arrays.asList("USER","ADMIN");
+            accountRepository.save(new Account("boyen", "root",true,roles));
 
         };
 

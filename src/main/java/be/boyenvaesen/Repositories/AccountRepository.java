@@ -6,9 +6,10 @@
 package be.boyenvaesen.Repositories;
 import be.boyenvaesen.Models.Account;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface AccountRepository extends MongoRepository<Account, String> {
   
-  public Account findByUsername(String username);
-
+  Account findByUsername(String username);
 }

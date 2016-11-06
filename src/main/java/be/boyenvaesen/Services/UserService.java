@@ -9,6 +9,7 @@ import be.boyenvaesen.Models.Account;
 import be.boyenvaesen.Repositories.AccountRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,4 +41,5 @@ public class UserService implements UserDetailsService {
                     + username + "'");
         }
     }
+
 }

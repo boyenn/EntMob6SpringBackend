@@ -5,32 +5,33 @@
  */
 package be.boyenvaesen.Humidity;
 
-import be.boyenvaesen.Models.*;
-import be.boyenvaesen.Services.*;
+import be.boyenvaesen.Models.Humidity;
+import be.boyenvaesen.Services.HumidityService;
 import be.boyenvaesen.helpers.postObject;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
-import java.util.TimeZone;
-import org.junit.*;
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import static org.assertj.core.api.Assertions.*;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+
 public class HumidityControllerTest {
 
     //CONSTANTS
@@ -76,10 +77,11 @@ public class HumidityControllerTest {
 //        Assert.assertEquals("Boyen", employee.getFirstName());
 //    }
     @Test
+    @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testList() {
 
-        ResponseEntity<Humidity[]> responseEntity
-                = restTemplate.getForEntity("/humidity", Humidity[].class);
+        ResponseEntity<Humidity[]> responseEntity;
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/humidity", Humidity[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Humidity[] humidities = responseEntity.getBody();
         assertEquals("first percentage : " , 75.1f, humidities[0].getPercentage(), MAX_ASSERT_FLOAT_OFFSET);
@@ -99,7 +101,7 @@ public class HumidityControllerTest {
 
         //Check if list is the list from setup
         ResponseEntity<Humidity[]> responseEntity
-                = restTemplate.getForEntity("/humidity", Humidity[].class);
+                = restTemplate.withBasicAuth("boyen","root").getForEntity("/humidity", Humidity[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Humidity[] humidities = responseEntity.getBody();
 
@@ -108,7 +110,7 @@ public class HumidityControllerTest {
 //        assertEquals(2, humidities.length);
 
         //Post a new Humidity
-        ResponseEntity<Humidity> postedEntity = restTemplate.postForEntity("/humidity", 
+        ResponseEntity<Humidity> postedEntity = restTemplate.withBasicAuth("boyen","root").postForEntity("/humidity",
                 new postObject<>(95f, postedDate), Humidity.class);
         Humidity postedHumidity = postedEntity.getBody();
         assertEquals(HttpStatus.CREATED, postedEntity.getStatusCode());
@@ -116,7 +118,7 @@ public class HumidityControllerTest {
 
         //Check if list is now changed with the new value
         responseEntity
-                = restTemplate.getForEntity("/humidity", Humidity[].class);
+                = restTemplate.withBasicAuth("boyen","root").getForEntity("/humidity", Humidity[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         humidities = responseEntity.getBody();
         //Check humidity percentages

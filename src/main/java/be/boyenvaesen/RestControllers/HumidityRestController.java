@@ -12,8 +12,11 @@ import be.boyenvaesen.helpers.postObject;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -26,28 +29,29 @@ public class HumidityRestController {
     @Autowired
     HumidityService service;
 
-    @RequestMapping("/humidity")
+    @RequestMapping(value = "/humidity",method = RequestMethod.GET)
+    @PreAuthorize("USER")
     @ResponseBody
     public ResponseEntity<List<Humidity>> getAll() {
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
 
     }
 
-    @RequestMapping("/humidity/month")
+    @RequestMapping(value ="/humidity/month",method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<HumidityByInterval>> getAllByMonth() {
         return new ResponseEntity<>(service.findAllByInterval(Calendar.MONTH), HttpStatus.OK);
 
     }
     
-    @RequestMapping("/humidity/hour")
+    @RequestMapping(value ="/humidity/hour",method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<HumidityByInterval>> getAllByHour() {
         return new ResponseEntity<>(service.findAllByInterval(Calendar.HOUR), HttpStatus.OK);
 
     }
     
-    @RequestMapping("/humidity/minute")
+    @RequestMapping(value ="/humidity/minute",method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<HumidityByInterval>> getAllByMinute() {
         return new ResponseEntity<>(service.findAllByInterval(Calendar.MINUTE), HttpStatus.OK);
