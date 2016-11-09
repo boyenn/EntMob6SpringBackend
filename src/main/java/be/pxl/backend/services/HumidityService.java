@@ -62,6 +62,12 @@ public class HumidityService {
     public void deleteAll() {
         rep.deleteAll();
     }
+    public void deleteAllByInterval(){
+        mongoTemplate.remove(new Query(), "humiditybyhour");
+        mongoTemplate.remove(new Query(), "humiditybymonth");
+        mongoTemplate.remove(new Query(), "humiditybyday");
+        mongoTemplate.remove(new Query(), "humiditybyminute");
+    }
     
     //USE mongoTemplate, cannot use CRUD repositories because you want to define the collection name
     public List<HumidityByInterval> findByIntervalBetween(Date start, Date end, int interval){
@@ -73,9 +79,11 @@ public class HumidityService {
         }
         
         switch(interval){
-            case Calendar.HOUR: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour"); 
+            case Calendar.DAY_OF_MONTH:  return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyday");
+            case Calendar.HOUR: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour") ;
             case Calendar.MONTH: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybymonth");
-            case Calendar.MINUTE:  return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyminute"); 
+            case Calendar.MINUTE:  return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyminute");
+
             default: return null;
         }
         
@@ -86,6 +94,7 @@ public class HumidityService {
      public List<HumidityByInterval> findAllByInterval( int interval){
        
         switch(interval){
+            case Calendar.DAY_OF_MONTH:  return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyday");
             case Calendar.HOUR: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyhour");
             case Calendar.MONTH: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybymonth");
             case Calendar.MINUTE: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyminute"); 

@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HumidityRepository extends MongoRepository<Humidity,String> {
-     public List<Humidity> findByMeasuredBetween(Date start, Date end);
+      List<Humidity> findByMeasuredBetween(Date start, Date end);
 
 }

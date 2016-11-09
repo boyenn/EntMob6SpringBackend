@@ -41,7 +41,7 @@ public class HumidityRestController {
         return new ResponseEntity<>(service.findAllByInterval(Calendar.MONTH), HttpStatus.OK);
 
     }
-    
+
     @RequestMapping(value ="/humidity/hour",method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<HumidityByInterval>> getAllByHour() {

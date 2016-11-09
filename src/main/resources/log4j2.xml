@@ -13,14 +13,27 @@
              providerURL="tcp://localhost:61616">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </JMS>
+        <RollingFile name="DAILY_LOG" fileName="log/daily.log"
+                     filePattern="log/%d{ddMMyyyy}_daily.log"
+        >
+            <PatternLayout pattern="%d [%7r] %5p - %c - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
 
-    </Appenders>
+
+</Appenders>
     <Loggers>
         <Root level="debug">
+
+
+            <AppenderRef ref="DAILY_LOG"/>
+            <AppenderRef ref="MyFile" />
         </Root>
         <Root level="info">
-           <!-- <AppenderRef ref="Console"/>-->
-            <AppenderRef ref="MyFile"/>
+            <AppenderRef ref="DAILY_LOG"/> <AppenderRef ref="MyFile" />
+
             <AppenderRef ref="jmsQueue"/>
         </Root>
     </Loggers>

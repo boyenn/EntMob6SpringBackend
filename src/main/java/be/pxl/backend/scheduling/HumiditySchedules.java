@@ -7,32 +7,28 @@ package be.pxl.backend.scheduling;
 
 import be.pxl.backend.models.Humidity;
 import be.pxl.backend.models.HumidityByInterval;
-
 import be.pxl.backend.services.HumidityService;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.fields;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  *
@@ -42,10 +38,10 @@ import org.springframework.data.mongodb.core.query.Update;
 public class HumiditySchedules {
 
     @Autowired
-    public HumidityService service;
+    private HumidityService service;
     @Autowired
-    MongoTemplate mongoTemplate;
-
+    private MongoTemplate mongoTemplate;
+    private static final Logger log = LoggerFactory.getLogger(HumiditySchedules.class);
     @Scheduled(fixedRate = 2000)
     public void updateIntervalDatabases() {
 //      
@@ -53,6 +49,7 @@ public class HumiditySchedules {
         
        
         c.setTime(new Date());
+        c.add(Calendar.HOUR_OF_DAY,1);
         Date now = c.getTime();
         
 //        //Clean records dating till :
@@ -145,7 +142,7 @@ public class HumiditySchedules {
             HumidityByInterval hbi = new HumidityByInterval();
             hbi.setDate((BasicDBObject) dbobject.get("id"));
             hbi.setAvPer((double) dbobject.get("avPer"));
-
+            log.info(hbi.getDate().toString());
             //build query
             Query query = new Query(Criteria.where("date").is(hbi.getDate()));
 
