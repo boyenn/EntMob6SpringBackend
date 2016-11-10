@@ -158,8 +158,8 @@ public class HumidityServiceTest {
         c.setTime(firstDate);
 
         List<HumidityByInterval> a = humidityService.findAllByInterval(Calendar.MONTH);
-        assertThat(a.get(a.size()-1).getDate()).hasMonth(c.get(Calendar.MONTH+1));
-        assertThat(a.get(a.size()-1).getDate()).hasDayOfMonth(0);
+        assertThat(a.get(a.size()-1).getDate()).hasMonth(c.get(Calendar.MONTH)+1);
+        assertThat(a.get(a.size()-1).getDate()).hasDayOfMonth(1);
         assertThat(a.get(a.size()-1).getDate()).hasHourOfDay(1);
         assertThat(a.get(a.size()-1).getDate()).hasMinute(0);
         assertThat(a.get(a.size()-1).getDate()).hasSecond(0);

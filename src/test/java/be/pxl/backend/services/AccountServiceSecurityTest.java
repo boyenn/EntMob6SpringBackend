@@ -22,11 +22,11 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Boyen on 1/11/2016.
- */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ContextConfiguration
+     */
+    @RunWith(SpringJUnit4ClassRunner.class)
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @ActiveProfiles("test")
+    @ContextConfiguration
 public class AccountServiceSecurityTest {
     @Autowired
     private AccountService accountService;

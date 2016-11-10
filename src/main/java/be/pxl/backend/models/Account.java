@@ -1,8 +1,9 @@
 package be.pxl.backend.models;
 
-import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Document(collection = "accounts")
 public class Account {
@@ -14,6 +15,8 @@ public class Account {
     private String password;
     private boolean enabled;
     private List<String> roles;
+
+
 
     public Account(String username, String password, boolean enabled, List<String> roles) {
         this.username = username;

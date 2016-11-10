@@ -2,23 +2,20 @@ package be.pxl.backend;
 
 import be.pxl.backend.models.Account;
 import be.pxl.backend.repositories.AccountRepository;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TimeZone;
-
-import javax.jms.Queue;
-import javax.jms.Topic;
-
-import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTopic;
-import org.springframework.boot.*;
-import org.springframework.boot.autoconfigure.*;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.TimeZone;
 
 @SpringBootApplication
 @ComponentScan
@@ -26,6 +23,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @Configuration
 @EnableJms
 @EnableGlobalMethodSecurity(prePostEnabled=true)
+@EnableMongoAuditing
 public class MainContext {
 
 

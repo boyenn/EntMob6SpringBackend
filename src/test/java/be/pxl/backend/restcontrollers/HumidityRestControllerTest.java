@@ -5,9 +5,11 @@
  */
 package be.pxl.backend.restcontrollers;
 
+import be.pxl.backend.helpers.PostObject;
 import be.pxl.backend.models.Humidity;
 import be.pxl.backend.services.HumidityService;
-import be.pxl.backend.helpers.PostObject;
+import be.pxl.backend.services.PerformedRequestService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +26,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -43,6 +44,8 @@ public class HumidityRestControllerTest {
     private TestRestTemplate restTemplate; //Spring's template for testing REST controllers
     @Autowired
     private HumidityService service;
+    @Autowired
+    private PerformedRequestService performedRequestService;
 
     //TEST OBJECTS
     private Date firstDate;
@@ -50,6 +53,7 @@ public class HumidityRestControllerTest {
 
     @Before
     public void setUp() {
+        performedRequestService.deleteAll();
         service.deleteAll();
         firstDate = new Date();
         Calendar cal = Calendar.getInstance();
@@ -66,6 +70,10 @@ public class HumidityRestControllerTest {
 
     }
 
+    @After
+    public void tearDown(){
+        performedRequestService.deleteAll();
+    }
 
     @Test
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
@@ -82,6 +90,7 @@ public class HumidityRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testScenarioPostOneGetList() {
         //Set up date that will be posted
         Date date = new Date();
