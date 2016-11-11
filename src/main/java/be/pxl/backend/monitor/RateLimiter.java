@@ -21,42 +21,43 @@ import org.springframework.stereotype.Component;
 @Component
 public class RateLimiter {
 
-    private static final Logger logger = LoggerFactory.getLogger(RateLimiter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RateLimiter.class);
+
+    //VALUES IN application.properties
 
     @Value("${backendratelimiter.refreshinterval}")
-    private   int refreshInterval;
+    private int refreshInterval;
     @Value("${backendratelimiter.maxrequests}")
     private int maxRequests;
-    @Autowired
-    AccountService accountService;
-    @Autowired
-    PerformedRequestService performedRequestService;
 
+    //AUTOWIRED PROPERTIES
+    @Autowired
+    private AccountService accountService;
+    @Autowired
+    private PerformedRequestService performedRequestService;
 
+    //Performs once around every method in the restcontrollers package
     @Around("execution(* be.pxl.backend.restcontrollers.*.*(..))")
     public Object  logServiceAccess(ProceedingJoinPoint joinPoint) throws Throwable {
-        logger.info("logServiceAccess");
-       UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //logger.info(auth.getUsername() + " Just accessed the rest controller!");
-        //TODO implement requests
+        //Get the userdetails (Spring)  of the user performing the request
+        UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //Get the account of that user
         Account account = accountService.findByUsername(auth.getUsername());
+        //Checks wether or not the request is allowed to be executed and if it is, executes it and saves the request to the database
         Boolean isAllowedToMakeRequest = performedRequestService.ExecuteRequest(account,joinPoint.getSignature().toLongString());
-        //isAllowedToMakeRequest=true;
+        //What the proxy will return
         Object retVal ;
+
         if(isAllowedToMakeRequest){
+            //Proceed the request as usual
             retVal = joinPoint.proceed();
         }
         else {
-            logger.info("Too many request");
+            //If the user has done too many requests, log that he tried again and return TOO_MANY_REQUESTS status code
+            LOGGER.info(auth.getUsername() + " has done too many requests");
             retVal = new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
         }
-       // logger.info(account.getUsername() + " Just accessed the rest controller!");
-        // start stopwatch
 
-
-
-
-        // stop stopwatch
         return retVal;
     }
 

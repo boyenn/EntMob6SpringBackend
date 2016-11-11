@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface PerformedRequestRepository extends MongoRepository<PerformedRequest,String> {
+    //Find all performedrequest by account
     List<PerformedRequest> findByAccount(Account account);
 
 }

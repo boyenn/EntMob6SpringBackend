@@ -7,11 +7,7 @@ package be.pxl.backend.helpers;
 
 import java.util.Date;
 
-/**
- *
- * @author Boyen
- * @param <T>
- */
+
 public class PostObject<T> {
     private T value;
     private Date timeStamp;

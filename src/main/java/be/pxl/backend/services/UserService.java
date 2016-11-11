@@ -7,8 +7,6 @@ package be.pxl.backend.services;
 
 import be.pxl.backend.models.Account;
 import be.pxl.backend.repositories.AccountRepository;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -17,10 +15,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-/**
- *
- * @author Boyen
- */
+import java.util.List;
+
+
 @Service
 public class UserService implements UserDetailsService {
 

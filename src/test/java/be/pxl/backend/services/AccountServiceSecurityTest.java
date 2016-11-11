@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @ActiveProfiles("test")
     @ContextConfiguration
-public class AccountServiceSecurityTest {
+    public class AccountServiceSecurityTest {
     @Autowired
     private AccountService accountService;
     @Autowired

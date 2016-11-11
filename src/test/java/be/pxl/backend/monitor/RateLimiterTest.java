@@ -44,7 +44,7 @@ public class RateLimiterTest {
     private AccountService accountService;
 
     @Autowired
-    PerformedRequestService performedRequestService;
+    private PerformedRequestService performedRequestService;
 
     @Autowired
     private TestRestTemplate restTemplate;

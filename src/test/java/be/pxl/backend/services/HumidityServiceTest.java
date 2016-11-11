@@ -42,7 +42,7 @@ public class HumidityServiceTest {
     @Autowired
     private HumidityService humidityService;
     @Autowired
-    HumiditySchedules humiditySchedules;
+    private HumiditySchedules humiditySchedules;
     private Humidity humidity1;
     private Humidity humidity2;
     private Date firstDate;
@@ -136,7 +136,7 @@ public class HumidityServiceTest {
         Calendar c = Calendar.getInstance();
         c.setTime(firstDate);
 
-        List<HumidityByInterval> a = humidityService.findAllByInterval(Calendar.HOUR);
+        List<HumidityByInterval> a = humidityService.findAllByInterval(Calendar.HOUR_OF_DAY);
         assertThat(a.get(a.size()-1).getDate()).hasHourOfDay(c.get(Calendar.HOUR_OF_DAY));
         assertThat(a.get(a.size()-1).getDate()).hasMinute(0);
         assertThat(a.get(a.size()-1).getDate()).hasSecond(0);

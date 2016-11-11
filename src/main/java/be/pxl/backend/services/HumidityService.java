@@ -5,19 +5,20 @@
  */
 package be.pxl.backend.services;
 
+import be.pxl.backend.helpers.PostObject;
 import be.pxl.backend.models.Humidity;
 import be.pxl.backend.models.HumidityByInterval;
 import be.pxl.backend.repositories.HumidityRepository;
-import be.pxl.backend.helpers.PostObject;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class HumidityService {
-
+    //AUTOWIRED PROPERTIES
     @Autowired
     private HumidityRepository rep;
     
@@ -33,11 +34,14 @@ public class HumidityService {
     private MongoTemplate mongoTemplate;
 
     public List<Humidity> getAll() {
-        return (List<Humidity>) rep.findAll();
+        return rep.findAll();
     }
 
     public List<Humidity> getBetweenDates(Date start, Date end) {
         return rep.findByMeasuredBetween(start, end);
+    }
+    public Humidity findLatest(){
+        return rep.findTop1ByOrderByMeasuredDesc();
     }
 
     public Humidity findOne(String Id) {
@@ -62,6 +66,9 @@ public class HumidityService {
     public void deleteAll() {
         rep.deleteAll();
     }
+
+
+    //BY INTERVAL
     public void deleteAllByInterval(){
         mongoTemplate.remove(new Query(), "humiditybyhour");
         mongoTemplate.remove(new Query(), "humiditybymonth");
@@ -71,19 +78,15 @@ public class HumidityService {
     
     //USE mongoTemplate, cannot use CRUD repositories because you want to define the collection name
     public List<HumidityByInterval> findByIntervalBetween(Date start, Date end, int interval){
-        Query query = Query.query(Criteria.where("data").gte(start).lte(end));
+        Query query = Query.query(Criteria.where("date").gte(start).lte(end));
       
-        if(interval==Calendar.HOUR){
-            
-           return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour");
-        }
+
         
         switch(interval){
             case Calendar.DAY_OF_MONTH:  return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyday");
-            case Calendar.HOUR: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour") ;
+            case Calendar.HOUR_OF_DAY: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyhour") ;
             case Calendar.MONTH: return mongoTemplate.find(query, HumidityByInterval.class, "humiditybymonth");
             case Calendar.MINUTE:  return mongoTemplate.find(query, HumidityByInterval.class, "humiditybyminute");
-
             default: return null;
         }
         
@@ -95,11 +98,13 @@ public class HumidityService {
        
         switch(interval){
             case Calendar.DAY_OF_MONTH:  return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyday");
-            case Calendar.HOUR: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyhour");
+            case Calendar.HOUR_OF_DAY: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyhour");
             case Calendar.MONTH: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybymonth");
             case Calendar.MINUTE: return mongoTemplate.findAll( HumidityByInterval.class, "humiditybyminute"); 
             default: return null;
         }
     }
+
+
 
 }

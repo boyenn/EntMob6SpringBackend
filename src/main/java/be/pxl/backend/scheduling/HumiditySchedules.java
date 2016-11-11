@@ -42,23 +42,23 @@ public class HumiditySchedules {
     @Autowired
     private MongoTemplate mongoTemplate;
     private static final Logger log = LoggerFactory.getLogger(HumiditySchedules.class);
-    @Scheduled(fixedRate = 2000)
-    public void updateIntervalDatabases() {
-//      
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        
-       
-        c.setTime(new Date());
-        c.add(Calendar.HOUR_OF_DAY,1);
-        Date now = c.getTime();
-        
-//        //Clean records dating till :
-        c.add(Calendar.DAY_OF_MONTH, -3);
- c.add(Calendar.YEAR, -3);
-        
-        // Retrieve humidity records from database
 
+    //EXECUTE BY INTERVAL IN MS
+    @Scheduled(fixedRate = 10000)
+    public void updateIntervalDatabases() {
+
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+
+        c.setTime(new Date());
+        Date now = c.getTime();
+
+        //Clean records dating till :
+        c.add(Calendar.DAY_OF_MONTH, -3);
+
+        // Retrieve humidity records from database
         AggregationResults<DBObject> resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MONTH);
+        //SAVE RESULTS TO DIFFERENT COLLECTION
         saveDBObjects(Calendar.MONTH, resultsDB);
         resultsDB = aggregationByInterval(c.getTime(), now, Calendar.DAY_OF_MONTH);
         saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB);
@@ -72,6 +72,7 @@ public class HumiditySchedules {
 
     private AggregationResults<DBObject> aggregationByInterval(Date from, Date to, int interval) {
         Aggregation agg = null;
+        //CREATE THE AGGREGATION QUERY
         switch (interval) {
             case Calendar.MONTH:
                 agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
@@ -103,7 +104,7 @@ public class HumiditySchedules {
                 break;
 
         }
-        
+        //EXECUTE THE AGGREGATION QUERY
         AggregationResults<DBObject> resultsDB = mongoTemplate.aggregate(agg, Humidity.class, DBObject.class);
 
         return resultsDB;
@@ -112,7 +113,7 @@ public class HumiditySchedules {
     private static ProjectionOperation projectObject() {
         return project("avPer").and("id").previousOperation();
     }
-
+    //PROJECTIONS USED TO CLEAN CODE
     private static ProjectionOperation minuteProjection() {
         return hourProjection()
                 .andExpression("minute(measured)").as("minuut");
@@ -134,13 +135,14 @@ public class HumiditySchedules {
                 .andExpression("month(measured)").as("maand");
     }
 
+    //SAVE THE OBJECTS
     private void saveDBObjects(int interval, AggregationResults<DBObject> resultsDB) {
 
         List<DBObject> tagCountDB = resultsDB.getMappedResults();
         tagCountDB.forEach((dbobject) -> {
             //build object
             HumidityByInterval hbi = new HumidityByInterval();
-            hbi.setDate((BasicDBObject) dbobject.get("id"));
+            hbi.setDateWithDBObject((BasicDBObject) dbobject.get("id"));
             hbi.setAvPer((double) dbobject.get("avPer"));
             log.info(hbi.getDate().toString());
             //build query
@@ -165,7 +167,6 @@ public class HumiditySchedules {
                     break;
             }
         });
-        //tagCountDB.clear();
     }
 
 }

@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.*;
  * Created by Boyen on 2/11/2016.
  */
 public class AccountTest {
-    Account ac;
+    private Account ac;
     @Before
     public void setUp() throws Exception {
          ac = new Account("Boyen","Pass",true, Arrays.asList("USER","ADMIN"));

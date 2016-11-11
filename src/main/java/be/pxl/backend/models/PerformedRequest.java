@@ -1,5 +1,7 @@
 package be.pxl.backend.models;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -7,11 +9,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-/**
- * Created by Boyen on 9/11/2016.
- */
+
 @Document(collection = "performedrequests")
 public class PerformedRequest {
+    //PROPERTIES
     @Id
     private String id;
     private String map;
@@ -20,6 +21,16 @@ public class PerformedRequest {
     @DBRef
     private Account account;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HumidityByInterval.class);
+
+    public PerformedRequest(Account account,String map) {
+        this.account = account;
+        this.map = map;
+    }
+
+
+
+    //GETTERS AND SETTERS
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -52,10 +63,6 @@ public class PerformedRequest {
         this.account = account;
     }
 
-    public PerformedRequest(Account account,String map) {
-        this.account = account;
-        this.map = map;
-    }
 
     @Override
     public String toString() {

@@ -5,10 +5,12 @@
  */
 package be.pxl.backend.models;
 
-import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
-
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
 
 /**
  *
@@ -16,12 +18,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "humidities")
 public class Humidity  {
-    
-    private @Id
-    String id;
+    //PROPERTIES
+    @Id
+    private String id;
     private float percentage;
-
     private Date measured;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Humidity.class);
+
 
     public Humidity() {
     }
@@ -32,6 +35,8 @@ public class Humidity  {
         this.measured = measured;
     }
 
+
+    //GETTERS AND SETTERS
     public String getId() {
         return id;
     }
@@ -52,4 +57,7 @@ public class Humidity  {
         this.measured = measured;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 }

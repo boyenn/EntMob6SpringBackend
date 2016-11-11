@@ -17,29 +17,29 @@ import java.util.Calendar;
  */
 @Service
 public class PerformedRequestService {
-    private static final Logger log = LoggerFactory.getLogger(PerformedRequestService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PerformedRequestService.class);
 
 
     @Autowired
-    PerformedRequestRepository performedRequestRepository;
+    private PerformedRequestRepository performedRequestRepository;
 
     @Value("${backendratelimiter.refreshinterval}")
-    private   int refreshInterval;
+    private int refreshInterval;
     @Value("${backendratelimiter.maxrequests}")
     private int maxRequests;
 
 
     public Boolean ExecuteRequest(Account account,String signature) {
         Calendar c = Calendar.getInstance();
+
         c.add(Calendar.SECOND,0-refreshInterval);
-      // Boolean b =  account.getPerformedRequests().stream().filter(performedRequest -> performedRequest.getCreatedDate().after(c.getTime())).count() <=maxRequests;
-        log.info("EXECUTEREQUEST");
+
         Boolean b = performedRequestRepository.findByAccount(account).stream().filter(performedRequest -> performedRequest.getCreatedDate().after(c.getTime())).count() <maxRequests;
-       // performedRequestRepository.save(new PerformedRequest(account,signature));
-       // log.info(performedRequestRepository.findByAccount(account).get(0).toString());
-        log.info("ISALLOWED?" + b.toString());
+
         if(b){
+
          performedRequestRepository.save(new PerformedRequest(account,signature));
+
         }
         return b;
 

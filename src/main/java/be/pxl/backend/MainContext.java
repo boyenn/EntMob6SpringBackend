@@ -42,9 +42,6 @@ public class MainContext {
         };
 
     }
-    /*@Bean
-    Topic topic (){
-        return new ActiveMQTopic("beanTopc");
-    }*/
+
 
 }
