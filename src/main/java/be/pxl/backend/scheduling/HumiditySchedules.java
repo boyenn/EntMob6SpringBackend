@@ -51,6 +51,7 @@ public class HumiditySchedules {
 
 
         c.setTime(new Date());
+        c.add(Calendar.HOUR_OF_DAY,1);
         Date now = c.getTime();
 
         //Clean records dating till :
