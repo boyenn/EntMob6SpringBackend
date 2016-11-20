@@ -5,7 +5,7 @@
  */
 package be.pxl.backend.repositories;
 
-import be.pxl.backend.models.Temperature;
+import be.pxl.backend.models.Brightness;
 import java.util.Date;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -16,8 +16,9 @@ import org.springframework.stereotype.Repository;
  * @author Thijs
  */
 @Repository
-public interface TemperatureByIntervalRepository extends MongoRepository<Temperature,String> {
-     //Find all temperatureinterval between 2 dates
-     List<Temperature> findByMeasuredBetween(Date start, Date end);
+public interface BrightnessByIntervalRepository extends MongoRepository<Brightness,String> {
+     //Find all brightnessinterval between 2 dates
+     List<Brightness> findByMeasuredBetween(Date start, Date end);
 
 }
+
