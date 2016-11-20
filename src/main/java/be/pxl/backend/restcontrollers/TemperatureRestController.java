@@ -6,9 +6,10 @@
 package be.pxl.backend.restcontrollers;
 
 import be.pxl.backend.helpers.PostObject;
-import be.pxl.backend.models.AirPressure;
-import be.pxl.backend.models.AirPressureByInterval;
-import be.pxl.backend.services.AirPressureService;
+import be.pxl.backend.models.Temperature;
+import be.pxl.backend.models.TemperatureByInterval;
+import be.pxl.backend.services.TemperatureService;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -28,16 +29,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Thijs
  */
 @RestController
-public class AirPressureRestController {
+public class TemperatureRestController {
     //AUTOWIRED PROPERTIES
     @Autowired
-    private AirPressureService service;
+    private TemperatureService service;
 
     //ALL
     //OPTIONAL : BETWEEN DATES
-    @RequestMapping(value ="/airpressure",method = RequestMethod.GET)
+    @RequestMapping(value ="/temperature",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<AirPressure>> getAll(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
+    public ResponseEntity<List<Temperature>> getAll(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
                                                  @RequestParam(name = "end",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date end) {
 
         if(start!=null && end!=null){
@@ -53,9 +54,9 @@ public class AirPressureRestController {
     }
     //BY DAY
     //OPTIONAL : BETWEEN DATES
-    @RequestMapping(value ="/airpressure/day",method = RequestMethod.GET)
+    @RequestMapping(value ="/temperature/day",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<AirPressureByInterval>> getByDay(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
+    public ResponseEntity<List<TemperatureByInterval>> getByDay(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
                                                                @RequestParam(name = "end",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date end) {
 
         if(start!=null && end!=null){
@@ -71,9 +72,9 @@ public class AirPressureRestController {
     }
     // BY MONTH
     //OPTIONAL : BETWEEN DATES
-    @RequestMapping(value ="/airpressure/month",method = RequestMethod.GET)
+    @RequestMapping(value ="/temperature/month",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<AirPressureByInterval>> getByMonth(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
+    public ResponseEntity<List<TemperatureByInterval>> getByMonth(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
                                                                @RequestParam(name = "end",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date end) {
 
         if(start!=null && end!=null){
@@ -90,9 +91,9 @@ public class AirPressureRestController {
 
     //HOUR
     //OPTIONAL : BETWEEN DATES
-    @RequestMapping(value ="/airpressure/hour",method = RequestMethod.GET)
+    @RequestMapping(value ="/temperature/hour",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<AirPressureByInterval>> getByHour(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
+    public ResponseEntity<List<TemperatureByInterval>> getByHour(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
                                                                @RequestParam(name = "end",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date end) {
 
         if(start!=null && end!=null){
@@ -108,9 +109,9 @@ public class AirPressureRestController {
     }
     //BY MINUTE
     //OPTIONAL : BETWEEN DATES
-    @RequestMapping(value ="/airpressure/minute",method = RequestMethod.GET)
+    @RequestMapping(value ="/temperature/minute",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<AirPressureByInterval>> getByMinute(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
+    public ResponseEntity<List<TemperatureByInterval>> getByMinute(@RequestParam(name= "start",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date start,
                                                               @RequestParam(name = "end",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date end) {
 
         if(start!=null && end!=null){
@@ -125,9 +126,9 @@ public class AirPressureRestController {
 
     }
     //LATEST
-    @RequestMapping(value ="/airpressure/latest",method = RequestMethod.GET)
+    @RequestMapping(value ="/temperature/latest",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<AirPressure> getLatest() {
+    public ResponseEntity<Temperature> getLatest() {
 
 
             return new ResponseEntity<>(service.findLatest(), HttpStatus.OK);
@@ -136,13 +137,15 @@ public class AirPressureRestController {
     }
 
     //POST ONE
-    @RequestMapping(path = "/airpressure", method = RequestMethod.POST)
-    public ResponseEntity<AirPressure> postNew(@RequestBody PostObject<Float> ap) {
-        return new ResponseEntity<>(service.addNew(ap), HttpStatus.CREATED);
+    @RequestMapping(path = "/temperature", method = RequestMethod.POST)
+    public ResponseEntity<Temperature> postNew(@RequestBody PostObject<Float> temp) {
+        return new ResponseEntity<>(service.addNew(temp), HttpStatus.CREATED);
     }
     //POST LIST
-    @RequestMapping(path = "/airpressurelist", method = RequestMethod.POST)
-    public ResponseEntity<Iterable<AirPressure>> postNew(@RequestBody List<PostObject<Float>> ap) {
-        return new ResponseEntity<>(service.addNew(ap), HttpStatus.CREATED);
+    @RequestMapping(path = "/temperaturelist", method = RequestMethod.POST)
+    public ResponseEntity<Iterable<Temperature>> postNew(@RequestBody List<PostObject<Float>> temp) {
+        return new ResponseEntity<>(service.addNew(temp), HttpStatus.CREATED);
     }
+
+
 }

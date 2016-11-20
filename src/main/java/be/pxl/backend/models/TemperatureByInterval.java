@@ -5,34 +5,30 @@
  */
 package be.pxl.backend.models;
 
-
 import com.mongodb.BasicDBObject;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
 /**
  *
  * @author Thijs
  */
-
-
 @Document
-public class AirPressureByInterval {
+public class TemperatureByInterval {
       //PROPERTIES
     @Id
     private String id;
     private Date date;
     private double avVal;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AirPressureByInterval.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemperatureByInterval.class);
 
-    public AirPressureByInterval() {
+    public TemperatureByInterval() {
 
     }
 
@@ -91,7 +87,7 @@ public class AirPressureByInterval {
 
     @Override
     public String toString() {
-        return "AirPressureByInterval{" +
+        return "TemperatureByInterval{" +
                 "id='" + id + '\'' +
                 ", date=" + date +
                 ", avVal=" + avVal +

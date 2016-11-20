@@ -5,18 +5,12 @@
  */
 package be.pxl.backend.restcontrollers;
 
-/**
- *
- * @author Thijs
- */
-
 import be.pxl.backend.helpers.PostObject;
-import be.pxl.backend.models.AirPressure;
-import be.pxl.backend.models.AirPressureByInterval;
-
+import be.pxl.backend.models.Temperature;
+import be.pxl.backend.models.TemperatureByInterval;
 import be.pxl.backend.scheduling.Schedules;
-import be.pxl.backend.services.AirPressureService;
 import be.pxl.backend.services.PerformedRequestService;
+import be.pxl.backend.services.TemperatureService;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,10 +34,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+/**
+ *
+ * @author Thijs
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class AirPressureRestControllerTest {
+public class TemperatureRestControllerTest {
 
     //CONSTANTS
     private final float MAX_ASSERT_FLOAT_OFFSET = 0.001f; //Maximum difference for a float to be considered equal in our case
@@ -52,7 +50,7 @@ public class AirPressureRestControllerTest {
     @Autowired
     private TestRestTemplate restTemplate; //Spring's template for testing REST controllers
     @Autowired
-    private AirPressureService service;
+    private TemperatureService service;
     @Autowired
     private PerformedRequestService performedRequestService;
 
@@ -88,13 +86,13 @@ public class AirPressureRestControllerTest {
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testList() {
 
-        ResponseEntity<AirPressure[]> responseEntity;
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure", AirPressure[].class);
+        ResponseEntity<Temperature[]> responseEntity;
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature", Temperature[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressure[] airpressures = responseEntity.getBody();
-        assertEquals("first value : " , 75.1f, airpressures[0].getValue(), MAX_ASSERT_FLOAT_OFFSET);
-        assertEquals("second value : " ,80f, airpressures[1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
-        assertEquals(2, airpressures.length);
+        Temperature[] temperatures = responseEntity.getBody();
+        assertEquals("first value : " , 75.1f, temperatures[0].getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals("second value : " ,80f, temperatures[1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2, temperatures.length);
 
     }
 
@@ -108,38 +106,38 @@ public class AirPressureRestControllerTest {
         Date dateToPost = cal.getTime();
 
         //Check if list is the list from setup
-        ResponseEntity<AirPressure[]> responseEntity
-                = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure", AirPressure[].class);
+        ResponseEntity<Temperature[]> responseEntity
+                = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature", Temperature[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressure[] airPressures = responseEntity.getBody();
+        Temperature[] temperatures = responseEntity.getBody();
 
-        assertThat(airPressures).hasSize(2)
-                .extracting(AirPressure::getValue).containsOnly(75.1f,80f);
+        assertThat(temperatures).hasSize(2)
+                .extracting(Temperature::getValue).containsOnly(75.1f,80f);
 
-        //Post a new airpressure
-        ResponseEntity<AirPressure> postedEntity = restTemplate.withBasicAuth("boyen","root").postForEntity("/airpressure",
-                new PostObject<>(95f, dateToPost), AirPressure.class);
-        AirPressure postedAirPressure = postedEntity.getBody();
+        //Post a new temperature
+        ResponseEntity<Temperature> postedEntity = restTemplate.withBasicAuth("boyen","root").postForEntity("/temperature",
+                new PostObject<>(95f, dateToPost), Temperature.class);
+        Temperature postedTemperature = postedEntity.getBody();
         assertEquals(HttpStatus.CREATED, postedEntity.getStatusCode());
-        assertEquals(95f, postedAirPressure.getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(95f, postedTemperature.getValue(), MAX_ASSERT_FLOAT_OFFSET);
 
         //Check if list is now changed with the new value
         responseEntity
-                = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure", AirPressure[].class);
+                = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature", Temperature[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        airPressures = responseEntity.getBody();
+        temperatures = responseEntity.getBody();
 
         //Check list length
-        assertEquals(3, airPressures.length);
+        assertEquals(3, temperatures.length);
 
-        //Check airPressure values
-        assertEquals(75.1f, airPressures[0].getValue(), MAX_ASSERT_FLOAT_OFFSET);
-        assertEquals(postedAirPressure.getValue(), airPressures[airPressures.length-1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
-        assertEquals(95f, airPressures[airPressures.length-1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        //Check temperature values
+        assertEquals(75.1f, temperatures[0].getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(postedTemperature.getValue(), temperatures[temperatures.length-1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(95f, temperatures[temperatures.length-1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
 
-        //Check airPressure dates
-        assertEquals(postedAirPressure.getValue(), airPressures[airPressures.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
-        assertEquals(dateToPost.getTime(), airPressures[airPressures.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
+        //Check temperature dates
+        assertEquals(postedTemperature.getValue(), temperatures[temperatures.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
+        assertEquals(dateToPost.getTime(), temperatures[temperatures.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
 
 
 
@@ -147,11 +145,11 @@ public class AirPressureRestControllerTest {
     @Test
     @WithMockUser(username = "boyen",password = "root",roles = {"USER","ADMIN"})
     public void testLatest(){
-        ResponseEntity<AirPressure> responseEntity;
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/latest", AirPressure.class);
+        ResponseEntity<Temperature> responseEntity;
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/latest", Temperature.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressure airPressure = responseEntity.getBody();
-        assertEquals( 80f, airPressure.getValue(), MAX_ASSERT_FLOAT_OFFSET);
+        Temperature temperature = responseEntity.getBody();
+        assertEquals( 80f, temperature.getValue(), MAX_ASSERT_FLOAT_OFFSET);
 
     }
 
@@ -165,17 +163,17 @@ public class AirPressureRestControllerTest {
         Date start = c.getTime();
         c.add(Calendar.MONTH,+2);
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/month?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/month?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(1,temperatures.length );
+        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
 
 
@@ -193,9 +191,9 @@ public class AirPressureRestControllerTest {
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/month?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/month?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/month?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/month?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
 
@@ -207,29 +205,29 @@ public class AirPressureRestControllerTest {
         Calendar c = Calendar.getInstance();
         Date start = c.getTime();
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/month?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/month?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
-        assertEquals(0,airPressures.length );
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
+        assertEquals(0,temperatures.length );
 
     }
     @Test
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testIntervalListMonthWithoutParam() {
 
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/month", AirPressureByInterval[].class);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/month", TemperatureByInterval[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(1,temperatures.length );
+        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
     //DAY
@@ -241,17 +239,17 @@ public class AirPressureRestControllerTest {
         Date start = c.getTime();
         c.add(Calendar.DAY_OF_MONTH,+2);
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/day?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/day?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length);
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(1,temperatures.length);
+        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
 
 
@@ -269,9 +267,9 @@ public class AirPressureRestControllerTest {
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/day?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/day?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/day?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/day?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
 
@@ -283,29 +281,29 @@ public class AirPressureRestControllerTest {
         Calendar c = Calendar.getInstance();
         Date start = c.getTime();
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/day?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/day?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
-        assertEquals(0,airPressures.length );
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
+        assertEquals(0,temperatures.length );
 
     }
     @Test
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testIntervalListDayWithoutParam() {
 
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/day", AirPressureByInterval[].class);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/day", TemperatureByInterval[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(1,temperatures.length );
+        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
 
@@ -318,17 +316,17 @@ public class AirPressureRestControllerTest {
         Date start = c.getTime();
         c.add(Calendar.HOUR_OF_DAY,+2);
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/hour?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/hour?start={start}&end={end}",TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(1,temperatures.length );
+        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
 
 
@@ -346,9 +344,9 @@ public class AirPressureRestControllerTest {
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/hour?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/hour?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/hour?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/hour?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
 
@@ -360,29 +358,29 @@ public class AirPressureRestControllerTest {
         Calendar c = Calendar.getInstance();
         Date start = c.getTime();
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/hour?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/hour?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
-        assertEquals(0,airPressures.length );
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
+        assertEquals(0,temperatures.length );
 
     }
     @Test
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testIntervalListHourWithoutParam() {
 
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/hour", AirPressureByInterval[].class);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/hour", TemperatureByInterval[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(1,temperatures.length );
+        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
     //MINUTE
@@ -394,18 +392,18 @@ public class AirPressureRestControllerTest {
         Date start = c.getTime();
         c.add(Calendar.HOUR_OF_DAY,+2);
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/minute?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/minute?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(2,airPressures.length );
-        assertEquals(80f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
-        assertEquals(75.1f,airPressures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,temperatures.length );
+        assertEquals(80f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(75.1f,temperatures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
 
     }
@@ -422,9 +420,9 @@ public class AirPressureRestControllerTest {
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/minute?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/minute?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/airpressure/minute?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperatures/minute?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
 
@@ -436,30 +434,30 @@ public class AirPressureRestControllerTest {
         Calendar c = Calendar.getInstance();
         Date start = c.getTime();
         Date end = c.getTime();
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
         HashMap<String,String> urlParams = new HashMap<>();
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/minute?start={start}&end={end}", AirPressureByInterval[].class,urlParams);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/minute?start={start}&end={end}", TemperatureByInterval[].class,urlParams);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
-        assertEquals(0,airPressures.length );
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
+        assertEquals(0,temperatures.length );
 
     }
     @Test
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
     public void testIntervalListMinuteWithoutParam() {
 
-        ResponseEntity<AirPressureByInterval[]> responseEntity;
+        ResponseEntity<TemperatureByInterval[]> responseEntity;
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/airpressure/minute", AirPressureByInterval[].class);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").getForEntity("/temperature/minute", TemperatureByInterval[].class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        AirPressureByInterval[] airPressures = responseEntity.getBody();
+        TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(2,airPressures.length );
-        assertEquals(80f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
-        assertEquals(75.1f,airPressures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,temperatures.length );
+        assertEquals(80f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(75.1f,temperatures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
     }
 
 
