@@ -8,7 +8,7 @@ package be.pxl.backend.restcontrollers;
 import be.pxl.backend.helpers.PostObject;
 import be.pxl.backend.models.Humidity;
 import be.pxl.backend.models.HumidityByInterval;
-import be.pxl.backend.scheduling.HumiditySchedules;
+import be.pxl.backend.scheduling.Schedules;
 import be.pxl.backend.services.HumidityService;
 import be.pxl.backend.services.PerformedRequestService;
 import org.joda.time.DateTime;
@@ -58,7 +58,7 @@ public class HumidityRestControllerTest {
     private Date firstDate;
     private Date secondDate;
     @Autowired
-    private HumiditySchedules humiditySchedules;
+    private Schedules schedules;
     @Before
     public void setUp() {
         service.deleteAllByInterval();
@@ -74,7 +74,7 @@ public class HumidityRestControllerTest {
         service.addNew(Arrays.asList(
                 new PostObject<>(75.1f, firstDate),
                 new PostObject<>(80f, secondDate)));
-        humiditySchedules.updateIntervalDatabases();
+        schedules.updateIntervalDatabases();
     }
 
     @After

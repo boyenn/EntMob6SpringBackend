@@ -7,7 +7,6 @@ package be.pxl.backend.scheduling;
 
 import be.pxl.backend.models.Humidity;
 import be.pxl.backend.models.HumidityByInterval;
-import be.pxl.backend.services.HumidityService;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.slf4j.Logger;
@@ -35,13 +34,12 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * @author Boyen
  */
 @Component
-public class HumiditySchedules {
+public class Schedules {
+
 
     @Autowired
-    private HumidityService service;
-    @Autowired
     private MongoTemplate mongoTemplate;
-    private static final Logger log = LoggerFactory.getLogger(HumiditySchedules.class);
+    private static final Logger log = LoggerFactory.getLogger(Schedules.class);
 
     //EXECUTE BY INTERVAL IN MS
     @Scheduled(fixedRate = 10000)
@@ -56,22 +54,25 @@ public class HumiditySchedules {
 
         //Clean records dating till :
         c.add(Calendar.DAY_OF_MONTH, -3);
-
-        // Retrieve humidity records from database
-        AggregationResults<DBObject> resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MONTH);
-        //SAVE RESULTS TO DIFFERENT COLLECTION
-        saveDBObjects(Calendar.MONTH, resultsDB);
-        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.DAY_OF_MONTH);
-        saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB);
-        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.HOUR);
-        saveDBObjects(Calendar.HOUR, resultsDB);
-        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MINUTE);
-        saveDBObjects(Calendar.MINUTE, resultsDB);
+        handlePerClass(c, now,Humidity.class,HumidityByInterval.class);
 
 
     }
 
-    private AggregationResults<DBObject> aggregationByInterval(Date from, Date to, int interval) {
+    private void handlePerClass(Calendar c, Date now,Class modelClass,Class intervalClass) {
+        // Retrieve humidity records from database
+        AggregationResults<DBObject> resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MONTH,modelClass);
+        //SAVE RESULTS TO DIFFERENT COLLECTION
+        saveDBObjects(Calendar.MONTH, resultsDB,HumidityByInterval.class);
+        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.DAY_OF_MONTH,modelClass);
+        saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB,HumidityByInterval.class);
+        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.HOUR,modelClass);
+        saveDBObjects(Calendar.HOUR, resultsDB,HumidityByInterval.class);
+        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MINUTE,modelClass);
+        saveDBObjects(Calendar.MINUTE, resultsDB,HumidityByInterval.class);
+    }
+
+    private AggregationResults<DBObject> aggregationByInterval(Date from, Date to, int interval,Class modelClass) {
         Aggregation agg = null;
         //CREATE THE AGGREGATION QUERY
         switch (interval) {
@@ -106,7 +107,7 @@ public class HumiditySchedules {
 
         }
         //EXECUTE THE AGGREGATION QUERY
-        AggregationResults<DBObject> resultsDB = mongoTemplate.aggregate(agg, Humidity.class, DBObject.class);
+        AggregationResults<DBObject> resultsDB = mongoTemplate.aggregate(agg, modelClass, DBObject.class);
 
         return resultsDB;
     }
@@ -137,21 +138,32 @@ public class HumiditySchedules {
     }
 
     //SAVE THE OBJECTS
-    private void saveDBObjects(int interval, AggregationResults<DBObject> resultsDB) {
+    private void saveDBObjects(int interval, AggregationResults<DBObject> resultsDB,Class intervalClass) {
 
         List<DBObject> tagCountDB = resultsDB.getMappedResults();
         tagCountDB.forEach((dbobject) -> {
             //build object
-            HumidityByInterval hbi = new HumidityByInterval();
-            hbi.setDateWithDBObject((BasicDBObject) dbobject.get("id"));
-            hbi.setAvPer((double) dbobject.get("avPer"));
-            log.info(hbi.getDate().toString());
-            //build query
-            Query query = new Query(Criteria.where("date").is(hbi.getDate()));
+            DBObject dbDoc = null;
+            Query query = null;
+            if(intervalClass == HumidityByInterval.class){
+                HumidityByInterval hbi = new HumidityByInterval();
+                hbi.setDateWithDBObject((BasicDBObject) dbobject.get("id"));
+                hbi.setAvPer((double) dbobject.get("avPer"));
+                log.info(hbi.getDate().toString());
+                //build query
+                query = new Query(Criteria.where("date").is(hbi.getDate()));
 
-            //build update
-            DBObject dbDoc = new BasicDBObject();
-            mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
+                //build update
+                dbDoc = new BasicDBObject();
+
+                mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
+            }
+            if(dbDoc == null ||query==null){
+                return;
+            }
+
+
+
             Update update = Update.fromDBObject(dbDoc, "_id"); //Exclude ID so it doesn't turn into null
             switch (interval) {
                 case Calendar.MONTH:

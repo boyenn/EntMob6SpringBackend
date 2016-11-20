@@ -39,23 +39,29 @@ public class RateLimiter {
     //Performs once around every method in the restcontrollers package
     @Around("execution(* be.pxl.backend.restcontrollers.*.*(..))")
     public Object  logServiceAccess(ProceedingJoinPoint joinPoint) throws Throwable {
-        //Get the userdetails (Spring)  of the user performing the request
-        UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //Get the account of that user
-        Account account = accountService.findByUsername(auth.getUsername());
-        //Checks wether or not the request is allowed to be executed and if it is, executes it and saves the request to the database
-        Boolean isAllowedToMakeRequest = performedRequestService.ExecuteRequest(account,joinPoint.getSignature().toLongString());
         //What the proxy will return
         Object retVal ;
+        //Get the userdetails (Spring)  of the user performing the request
+        try{
+            UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            //Get the account of that user
+            Account account = accountService.findByUsername(auth.getUsername());
+            //Checks wether or not the request is allowed to be executed and if it is, executes it and saves the request to the database
+            Boolean isAllowedToMakeRequest = performedRequestService.ExecuteRequest(account,joinPoint.getSignature().toLongString());
 
-        if(isAllowedToMakeRequest){
-            //Proceed the request as usual
+
+            if(isAllowedToMakeRequest){
+                //Proceed the request as usual
+                retVal = joinPoint.proceed();
+            }
+            else {
+                //If the user has done too many requests, log that he tried again and return TOO_MANY_REQUESTS status code
+                LOGGER.info(auth.getUsername() + " has done too many requests");
+                retVal = new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
+            }
+
+        }catch (Exception ex){
             retVal = joinPoint.proceed();
-        }
-        else {
-            //If the user has done too many requests, log that he tried again and return TOO_MANY_REQUESTS status code
-            LOGGER.info(auth.getUsername() + " has done too many requests");
-            retVal = new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
         }
 
         return retVal;

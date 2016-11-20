@@ -33,7 +33,7 @@ public class HumidityRestController {
                                                  @RequestParam(name = "end",required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Date end) {
 
         if(start!=null && end!=null){
-            return new ResponseEntity<>(service.getBetweenDates(start,end), HttpStatus.OK);
+                return new ResponseEntity<>(service.getBetweenDates(start,end), HttpStatus.OK);
         }
         else if (start==null&&end==null){
             return new ResponseEntity<>(service.getAll(), HttpStatus.OK);

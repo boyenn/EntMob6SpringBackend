@@ -5,7 +5,7 @@ import be.pxl.backend.models.Humidity;
 import be.pxl.backend.models.HumidityByInterval;
 import be.pxl.backend.repositories.HumidityByIntervalRepository;
 import be.pxl.backend.repositories.HumidityRepository;
-import be.pxl.backend.scheduling.HumiditySchedules;
+import be.pxl.backend.scheduling.Schedules;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class HumidityServiceTest {
     @Autowired
     private HumidityService humidityService;
     @Autowired
-    private HumiditySchedules humiditySchedules;
+    private Schedules schedules;
     private Humidity humidity1;
     private Humidity humidity2;
     private Date firstDate;
@@ -69,7 +69,7 @@ public class HumidityServiceTest {
         humidity2=humidityRepository.save(
                 humidity2
         );
-        humiditySchedules.updateIntervalDatabases();
+        schedules.updateIntervalDatabases();
 
 
     }
