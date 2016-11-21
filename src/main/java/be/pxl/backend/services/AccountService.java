@@ -34,6 +34,14 @@ public class AccountService {
     public Account findByUsernameAndPassword(String username,String password){
         return accountRepository.findByUsernameAndPassword(username,password);
     }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Account updatePassword(String username,String newpassword){
+
+       Account ac = accountRepository.findByUsername(username);
+        ac.setPassword(newpassword);
+        accountRepository.save(ac);
+        return ac;
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteAll() {

@@ -63,13 +63,13 @@ public class Schedules {
         // Retrieve humidity records from database
         AggregationResults<DBObject> resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MONTH,modelClass);
         //SAVE RESULTS TO DIFFERENT COLLECTION
-        saveDBObjects(Calendar.MONTH, resultsDB,HumidityByInterval.class);
+        saveDBObjects(Calendar.MONTH, resultsDB,HumidityByInterval.class,"humidity");
         resultsDB = aggregationByInterval(c.getTime(), now, Calendar.DAY_OF_MONTH,modelClass);
-        saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB,HumidityByInterval.class);
+        saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB,HumidityByInterval.class,"humidity");
         resultsDB = aggregationByInterval(c.getTime(), now, Calendar.HOUR,modelClass);
-        saveDBObjects(Calendar.HOUR, resultsDB,HumidityByInterval.class);
+        saveDBObjects(Calendar.HOUR, resultsDB,HumidityByInterval.class,"humidity");
         resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MINUTE,modelClass);
-        saveDBObjects(Calendar.MINUTE, resultsDB,HumidityByInterval.class);
+        saveDBObjects(Calendar.MINUTE, resultsDB,HumidityByInterval.class,"humidity");
     }
 
     private AggregationResults<DBObject> aggregationByInterval(Date from, Date to, int interval,Class modelClass) {
@@ -138,7 +138,7 @@ public class Schedules {
     }
 
     //SAVE THE OBJECTS
-    private void saveDBObjects(int interval, AggregationResults<DBObject> resultsDB,Class intervalClass) {
+    private void saveDBObjects(int interval, AggregationResults<DBObject> resultsDB,Class intervalClass,String collectionPrefix) {
 
         List<DBObject> tagCountDB = resultsDB.getMappedResults();
         tagCountDB.forEach((dbobject) -> {
@@ -157,6 +157,10 @@ public class Schedules {
                 dbDoc = new BasicDBObject();
 
                 mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
+            }else {
+                //Other models
+
+
             }
             if(dbDoc == null ||query==null){
                 return;
@@ -167,16 +171,16 @@ public class Schedules {
             Update update = Update.fromDBObject(dbDoc, "_id"); //Exclude ID so it doesn't turn into null
             switch (interval) {
                 case Calendar.MONTH:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, "humiditybymonth"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"bymonth"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
                 case Calendar.DAY_OF_MONTH:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, "humiditybyday"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"byday"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
                 case Calendar.HOUR:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, "humiditybyhour"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"byhour"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
                 case Calendar.MINUTE:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, "humiditybyminute"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"byminute"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
             }
         });

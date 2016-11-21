@@ -36,7 +36,7 @@ public class MainContext {
     CommandLineRunner init(final AccountRepository accountRepository) {
 
         return arg0 -> {
-            List<String> roles = Arrays.asList("USER","ADMIN");
+            List<String> roles = Arrays.asList("ROLE_ADMIN","ROLE_USER");
             accountRepository.save(new Account("boyen", "root",true,roles));
 
         };
