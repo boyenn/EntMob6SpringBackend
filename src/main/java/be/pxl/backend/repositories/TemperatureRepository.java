@@ -6,10 +6,12 @@
 package be.pxl.backend.repositories;
 
 import be.pxl.backend.models.Temperature;
-import java.util.Date;
-import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TemperatureRepository extends MongoRepository<Temperature,String> {
       //Find all Temperature between 2 dates
+      @Transactional(readOnly = true)
       List<Temperature> findByMeasuredBetween(Date start, Date end);
       //Find Latest Temperature
+      @Transactional(readOnly = true)
       Temperature findTop1ByOrderByMeasuredDesc();
 }

@@ -5,11 +5,13 @@
  */
 package be.pxl.backend.models;
 
-import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
  *
@@ -17,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Document(collection = "brightnesses")
+@Transactional
 public class Brightness {
   //PROPERTIES
     @Id

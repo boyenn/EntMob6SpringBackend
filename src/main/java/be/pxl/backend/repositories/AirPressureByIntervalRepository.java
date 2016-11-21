@@ -6,10 +6,12 @@
 package be.pxl.backend.repositories;
 
 import be.pxl.backend.models.AirPressure;
-import java.util.Date;
-import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AirPressureByIntervalRepository extends MongoRepository<AirPressure,String> {
      //Find all AirPressureByInterval between 2 dates
+     @Transactional(readOnly = true)
      List<AirPressure> findByMeasuredBetween(Date start, Date end);
 
 }

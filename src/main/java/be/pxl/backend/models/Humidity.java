@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -17,6 +18,7 @@ import java.util.Date;
  * @author Boyen
  */
 @Document(collection = "humidities")
+@Transactional
 public class Humidity  {
     //PROPERTIES
     @Id
