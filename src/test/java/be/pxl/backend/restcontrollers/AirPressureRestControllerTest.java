@@ -328,8 +328,9 @@ public class AirPressureRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         AirPressureByInterval[] airPressures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,airPressures.length );
+        assertEquals((75.1f),airPressures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
 
 
@@ -382,8 +383,9 @@ public class AirPressureRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         AirPressureByInterval[] airPressures = responseEntity.getBody();
 
-        assertEquals(1,airPressures.length );
-        assertEquals((75.1f+80f)/2f,airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,airPressures.length );
+        assertEquals((75.1f),airPressures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),airPressures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
     //MINUTE

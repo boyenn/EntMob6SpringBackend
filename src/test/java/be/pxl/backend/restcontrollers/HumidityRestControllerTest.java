@@ -325,8 +325,9 @@ public class HumidityRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         HumidityByInterval[] humidities = responseEntity.getBody();
 
-        assertEquals(1,humidities.length );
-        assertEquals((75.1f+80f)/2f,humidities[0].getAvPer(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,humidities.length );
+        assertEquals((75.1f),humidities[1].getAvPer(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),humidities[0].getAvPer(),MAX_ASSERT_FLOAT_OFFSET);
 
 
 
@@ -379,8 +380,9 @@ public class HumidityRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         HumidityByInterval[] humidities = responseEntity.getBody();
 
-        assertEquals(1,humidities.length );
-        assertEquals((75.1f+80f)/2f,humidities[0].getAvPer(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,humidities.length );
+        assertEquals((75.1f),humidities[1].getAvPer(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),humidities[0].getAvPer(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
     //MINUTE

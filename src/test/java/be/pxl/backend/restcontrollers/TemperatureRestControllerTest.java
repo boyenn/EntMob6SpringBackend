@@ -327,8 +327,9 @@ public class TemperatureRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,temperatures.length );
-        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,temperatures.length );
+        assertEquals((75.1f),temperatures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
 
 
@@ -381,8 +382,9 @@ public class TemperatureRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         TemperatureByInterval[] temperatures = responseEntity.getBody();
 
-        assertEquals(1,temperatures.length );
-        assertEquals((75.1f+80f)/2f,temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,temperatures.length );
+        assertEquals((75.1f),temperatures[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),temperatures[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
     //MINUTE
@@ -424,7 +426,7 @@ public class TemperatureRestControllerTest {
 
         responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/minute?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperatures/minute?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/temperature/minute?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
 

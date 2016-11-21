@@ -193,9 +193,9 @@ public class BrightnessRestControllerTest {
         urlParams.put("start", new DateTime(start).toString(ISODateTimeFormat.dateTime()));
         urlParams.put("end",new DateTime(end).toString(ISODateTimeFormat.dateTime()));
 
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/brightnesses/month?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/brightness/month?start={start}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/brightnesses/month?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
+        responseEntity = restTemplate.withBasicAuth("boyen","root").exchange("/brightness/month?end={end}", HttpMethod.GET, HttpEntity.EMPTY, String.class,start);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
 
@@ -327,8 +327,10 @@ public class BrightnessRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         BrightnessByInterval[] brightnesses = responseEntity.getBody();
 
-        assertEquals(1,brightnesses.length );
-        assertEquals((75.1f+80f)/2f,brightnesses[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,brightnesses.length );
+        assertEquals((75.1f),brightnesses[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((80f),brightnesses[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+
 
 
 
@@ -381,8 +383,9 @@ public class BrightnessRestControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         BrightnessByInterval[] brightnesses = responseEntity.getBody();
 
-        assertEquals(1,brightnesses.length );
-        assertEquals((75.1f+80f)/2f,brightnesses[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals(2,brightnesses.length );
+        assertEquals((80f),brightnesses[0].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
+        assertEquals((75.1f),brightnesses[1].getAvVal(),MAX_ASSERT_FLOAT_OFFSET);
 
     }
     //MINUTE
