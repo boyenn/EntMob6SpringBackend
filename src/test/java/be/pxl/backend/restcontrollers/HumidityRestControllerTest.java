@@ -68,7 +68,7 @@ public class HumidityRestControllerTest {
         Calendar cal = Calendar.getInstance();
        
         cal.setTime(firstDate);
-        cal.add(Calendar.MINUTE, 10); // add 10 minutes
+        cal.add(Calendar.HOUR_OF_DAY, 1); // add 1 hour
         secondDate = cal.getTime();
 
         service.addNew(Arrays.asList(
@@ -99,7 +99,7 @@ public class HumidityRestControllerTest {
 
     @Test
     @WithMockUser(username="boyen",password = "root",roles = {"USER","ADMIN"})
-    public void testScenarioPostOneGetList() {
+    public void  testScenarioPostOneGetList() {
         //Set up date that will be posted
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, 15); // add 15 minutes

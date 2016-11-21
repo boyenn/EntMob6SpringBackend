@@ -5,8 +5,7 @@
  */
 package be.pxl.backend.scheduling;
 
-import be.pxl.backend.models.Humidity;
-import be.pxl.backend.models.HumidityByInterval;
+import be.pxl.backend.models.*;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.slf4j.Logger;
@@ -54,54 +53,57 @@ public class Schedules {
 
         //Clean records dating till :
         c.add(Calendar.DAY_OF_MONTH, -3);
-        handlePerClass(c, now,Humidity.class,HumidityByInterval.class);
+        handlePerClass(c, now,Humidity.class,HumidityByInterval.class,"percentage","avPer","humidity","humidities");
+        handlePerClass(c, now,AirPressure.class,AirPressureByInterval.class,"value","avVal","airpressure","airpressures");
+        handlePerClass(c, now,Brightness.class,BrightnessByInterval.class,"value","avVal","brightness","brightnesses");
+        handlePerClass(c, now,Temperature.class,TemperatureByInterval.class,"value","avVal","temperature","temperatures");
 
 
     }
 
-    private void handlePerClass(Calendar c, Date now,Class modelClass,Class intervalClass) {
+    private void handlePerClass(Calendar c, Date now,Class modelClass,Class intervalClass,String modelValueName,String intervalValueName,String collectionPrefix,String modelTableName) {
         // Retrieve humidity records from database
-        AggregationResults<DBObject> resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MONTH,modelClass);
+        AggregationResults<DBObject> resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MONTH,modelClass,modelValueName,intervalValueName);
         //SAVE RESULTS TO DIFFERENT COLLECTION
-        saveDBObjects(Calendar.MONTH, resultsDB,HumidityByInterval.class,"humidity");
-        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.DAY_OF_MONTH,modelClass);
-        saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB,HumidityByInterval.class,"humidity");
-        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.HOUR,modelClass);
-        saveDBObjects(Calendar.HOUR, resultsDB,HumidityByInterval.class,"humidity");
-        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MINUTE,modelClass);
-        saveDBObjects(Calendar.MINUTE, resultsDB,HumidityByInterval.class,"humidity");
+        saveDBObjects(Calendar.MONTH, resultsDB,intervalClass,collectionPrefix);
+        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.DAY_OF_MONTH,modelClass,modelValueName,intervalValueName);
+        saveDBObjects(Calendar.DAY_OF_MONTH, resultsDB,intervalClass,collectionPrefix);
+        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.HOUR,modelClass,modelValueName,intervalValueName);
+        saveDBObjects(Calendar.HOUR, resultsDB,intervalClass,collectionPrefix);
+        resultsDB = aggregationByInterval(c.getTime(), now, Calendar.MINUTE,modelClass,modelValueName,intervalValueName);
+        saveDBObjects(Calendar.MINUTE, resultsDB,intervalClass,collectionPrefix);
     }
 
-    private AggregationResults<DBObject> aggregationByInterval(Date from, Date to, int interval,Class modelClass) {
+    private AggregationResults<DBObject> aggregationByInterval(Date from, Date to, int interval,Class modelClass,String modelValueName,String intervalValueName ) {
         Aggregation agg = null;
         //CREATE THE AGGREGATION QUERY
         switch (interval) {
             case Calendar.MONTH:
                 agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
-                        monthProjection(),
-                        group(fields("jaar", "maand")).avg("percentage").as("avPer"),
-                        projectObject()
+                        monthProjection(modelValueName),
+                        group(fields("jaar", "maand")).avg(modelValueName).as(intervalValueName),
+                        projectObject(intervalValueName)
                 );
                 break;
             case Calendar.DAY_OF_MONTH:
                 agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
-                        dayProjection(),
-                        group(fields("jaar", "maand", "dag")).avg("percentage").as("avPer"),
-                        projectObject()
+                        dayProjection(modelValueName),
+                        group(fields("jaar", "maand", "dag")).avg(modelValueName).as(intervalValueName),
+                        projectObject(intervalValueName)
                 );
                 break;
             case Calendar.HOUR:
                 agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
-                        hourProjection(),
-                        group(fields("jaar", "maand", "dag", "uur")).avg("percentage").as("avPer"),
-                        projectObject()
+                        hourProjection(modelValueName),
+                        group(fields("jaar", "maand", "dag", "uur")).avg(modelValueName).as(intervalValueName),
+                        projectObject(intervalValueName)
                 );
                 break;
             case Calendar.MINUTE:
                 agg = newAggregation(match(Criteria.where("measured").gte(from).lte(to)),
-                        minuteProjection(),
-                        group(fields("jaar", "maand", "dag", "uur", "minuut")).avg("percentage").as("avPer"),
-                        projectObject()
+                        minuteProjection(modelValueName),
+                        group(fields("jaar", "maand", "dag", "uur", "minuut")).avg(modelValueName).as(intervalValueName),
+                        projectObject(intervalValueName)
                 );
                 break;
 
@@ -112,27 +114,27 @@ public class Schedules {
         return resultsDB;
     }
 
-    private static ProjectionOperation projectObject() {
-        return project("avPer").and("id").previousOperation();
+    private static ProjectionOperation projectObject(String intervalValueName) {
+        return project(intervalValueName).and("id").previousOperation();
     }
     //PROJECTIONS USED TO CLEAN CODE
-    private static ProjectionOperation minuteProjection() {
-        return hourProjection()
+    private static ProjectionOperation minuteProjection(String modelValueName) {
+        return hourProjection(modelValueName)
                 .andExpression("minute(measured)").as("minuut");
     }
 
-    private static ProjectionOperation hourProjection() {
-        return dayProjection()
+    private static ProjectionOperation hourProjection(String modelValueName) {
+        return dayProjection(modelValueName)
                 .andExpression("hour(measured)").as("uur");
     }
 
-    private static ProjectionOperation dayProjection() {
-        return monthProjection()
+    private static ProjectionOperation dayProjection(String modelValueName) {
+        return monthProjection(modelValueName)
                 .andExpression("dayOfMonth(measured)").as("dag");
     }
 
-    private static ProjectionOperation monthProjection() {
-        return project("id").and("percentage").as("percentage")
+    private static ProjectionOperation monthProjection(String modelValueName) {
+        return project("id").and(modelValueName).as(modelValueName)
                 .andExpression("year(measured)").as("jaar")
                 .andExpression("month(measured)").as("maand");
     }
@@ -157,9 +159,49 @@ public class Schedules {
                 dbDoc = new BasicDBObject();
 
                 mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
-            }else {
+            }else if(intervalClass== AirPressureByInterval.class) {
                 //Other models
+                AirPressureByInterval hbi = new AirPressureByInterval();
+                hbi.setDateWithDBObject((BasicDBObject) dbobject.get("id"));
+                hbi.setAvVal((double) dbobject.get("avVal"));
+                log.info(hbi.getDate().toString());
+                //build query
+                query = new Query(Criteria.where("date").is(hbi.getDate()));
 
+                //build update
+                dbDoc = new BasicDBObject();
+
+                mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
+
+            }
+            else if(intervalClass== TemperatureByInterval.class) {
+                //Other models
+                TemperatureByInterval hbi = new TemperatureByInterval();
+                hbi.setDateWithDBObject((BasicDBObject) dbobject.get("id"));
+                hbi.setAvVal((double) dbobject.get("avVal"));
+                log.info(hbi.getDate().toString());
+                //build query
+                query = new Query(Criteria.where("date").is(hbi.getDate()));
+
+                //build update
+                dbDoc = new BasicDBObject();
+
+                mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
+
+            }
+            else if(intervalClass== BrightnessByInterval.class) {
+                //Other models
+                BrightnessByInterval hbi = new BrightnessByInterval();
+                hbi.setDateWithDBObject((BasicDBObject) dbobject.get("id"));
+                hbi.setAvVal((double) dbobject.get("avVal"));
+                log.info(hbi.getDate().toString());
+                //build query
+                query = new Query(Criteria.where("date").is(hbi.getDate()));
+
+                //build update
+                dbDoc = new BasicDBObject();
+
+                mongoTemplate.getConverter().write(hbi, dbDoc); //Convert to DB ojectect , needed to create the update
 
             }
             if(dbDoc == null ||query==null){
@@ -171,16 +213,16 @@ public class Schedules {
             Update update = Update.fromDBObject(dbDoc, "_id"); //Exclude ID so it doesn't turn into null
             switch (interval) {
                 case Calendar.MONTH:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"bymonth"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, intervalClass, collectionPrefix+"bymonth"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
                 case Calendar.DAY_OF_MONTH:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"byday"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, intervalClass, collectionPrefix+"byday"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
                 case Calendar.HOUR:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"byhour"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update,intervalClass, collectionPrefix+"byhour"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
                 case Calendar.MINUTE:
-                    mongoTemplate.upsert(query, update, HumidityByInterval.class, collectionPrefix+"byminute"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
+                    mongoTemplate.upsert(query, update, intervalClass, collectionPrefix+"byminute"); // upsert = up(date) and (in)sert , similar to AddOrUpdate in C#
                     break;
             }
         });

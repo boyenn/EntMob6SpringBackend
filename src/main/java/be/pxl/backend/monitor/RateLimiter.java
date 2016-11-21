@@ -46,7 +46,7 @@ public class RateLimiter {
             UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             //Get the account of that user
             Account account = accountService.findByUsername(auth.getUsername());
-            //Checks wether or not the request is allowed to be executed and if it is, executes it and saves the request to the database
+            //Checks whether or not the request is allowed to be executed and if it is, executes it and saves the request to the database
             Boolean isAllowedToMakeRequest = performedRequestService.ExecuteRequest(account,joinPoint.getSignature().toLongString());
 
 

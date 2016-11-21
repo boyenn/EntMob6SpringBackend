@@ -11,15 +11,9 @@ import be.pxl.backend.models.BrightnessByInterval;
 import be.pxl.backend.scheduling.Schedules;
 import be.pxl.backend.services.BrightnessService;
 import be.pxl.backend.services.PerformedRequestService;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +27,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -68,7 +70,7 @@ public class BrightnessRestControllerTest {
         Calendar cal = Calendar.getInstance();
        
         cal.setTime(firstDate);
-        cal.add(Calendar.MINUTE, 10); // add 10 minutes
+        cal.add(Calendar.HOUR_OF_DAY, 1); // add 1 hour
         secondDate = cal.getTime();
 
         service.addNew(Arrays.asList(
@@ -136,7 +138,7 @@ public class BrightnessRestControllerTest {
         assertEquals(95f, brightnesses[brightnesses.length-1].getValue(), MAX_ASSERT_FLOAT_OFFSET);
 
         //Check brightness dates
-        assertEquals(postedBrightness.getValue(), brightnesses[brightnesses.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
+        assertEquals(postedBrightness.getMeasured().getTime(), brightnesses[brightnesses.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
         assertEquals(dateToPost.getTime(), brightnesses[brightnesses.length-1].getMeasured().getTime(),MAX_ASSERT_DATE_MILLISECONDS_OFFSET);
 
 
